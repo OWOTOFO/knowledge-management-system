@@ -1,0 +1,130 @@
+# Acceptance set for six SEC filings and the two SEC companyfacts JSON snapshots.
+# Amounts are exact USD, including when the answer expresses them in millions or billions.
+# SQL row assertions ignore column order and aliases, and check associated values in the same row.
+# Document citations are checked against the requested filing and section.
+
+- id: aapl-fy24-net-sales
+  question: What were Apple's total net sales in FY2024? Use the financial facts and identify the fiscal year and USD amount.
+  expected_route: structured
+  expected_final_route: structured
+  required_citations: [{kind: sql}]
+  required_sql_rows: [[AAPL, 2024, USD, 391035000000]]
+  answer_amounts_usd:
+    - {usd: 391035000000}
+  answer_patterns: ['\b(?:FY\s*)?2024\b']
+
+- id: aapl-fy25-fy26-net-sales
+  question: What were Apple's total net sales in FY2025 and FY2026? Use the financial facts and give one line per fiscal year in USD.
+  expected_route: structured
+  expected_final_route: structured
+  required_citations: [{kind: sql}]
+  required_sql_rows:
+    - [AAPL, 2025, USD, 416161000000]
+    - [AAPL, 2026, USD, 478834000000]
+  answer_amounts_usd:
+    - {usd: 416161000000, on_line: '^(?!.*2026).*2025'}
+    - {usd: 478834000000, on_line: '^(?!.*2025).*2026'}
+
+- id: meta-fy24-fy25-revenue
+  question: What was Meta's actual reported total revenue in FY2024 and FY2025? Use the financial facts and give one line per fiscal year in USD.
+  expected_route: structured
+  expected_final_route: structured
+  required_citations: [{kind: sql}]
+  required_sql_rows:
+    - [META, 2024, USD, 164501000000]
+    - [META, 2025, USD, 200966000000]
+  answer_amounts_usd:
+    - {usd: 164501000000, on_line: '^(?!.*2025).*2024'}
+    - {usd: 200966000000, on_line: '^(?!.*2024).*2025'}
+
+- id: meta-q3-fy26-revenue
+  question: What was Meta's total revenue in Q3 2026 alone? Use the quarterly financial facts and report the period and amount in USD.
+  expected_route: structured
+  expected_final_route: structured
+  required_citations: [{kind: sql}]
+  required_sql_rows: [[META, 2026, Q3, USD, 64601000000]]
+  answer_amounts_usd:
+    - {usd: 64601000000}
+  answer_patterns: ['\b(?:Q3|third quarter|three months)\b', '\b(?:FY\s*)?2026\b']
+
+- id: meta-9m-fy26-revenue
+  question: What was Meta's total revenue for the nine months ended September 30, 2026? Use the financial facts with the period start and end, and report the amount in USD.
+  expected_route: structured
+  expected_final_route: structured
+  required_citations: [{kind: sql}]
+  required_sql_rows: [[META, '2026-01-01', '2026-09-30', USD, 181712000000]]
+  answer_amounts_usd:
+    - {usd: 181712000000}
+  answer_patterns: ['\b(?:nine|9)[ -]months?\b|\bYTD\b', '\b(?:FY\s*)?2026\b']
+
+- id: aapl-meta-fy24-net-income
+  question: Compare Apple's and Meta's consolidated net income for FY2024 using the financial facts. Give one line per company in USD.
+  expected_route: structured
+  expected_final_route: structured
+  required_citations: [{kind: sql}]
+  required_sql_rows:
+    - [AAPL, 2024, USD, 93736000000]
+    - [META, 2024, USD, 62360000000]
+  answer_amounts_usd:
+    - {usd: 93736000000, on_line: '^(?!.*\bmeta\b).*\b(?:apple|aapl)\b'}
+    - {usd: 62360000000, on_line: '^(?!.*\b(?:apple|aapl)\b).*\bmeta\b'}
+
+- id: aapl-fy26-outsourcing-risk
+  question: In Item 1A of Apple's FY2026 10-K, what manufacturing dependency and trade-off does Apple disclose about its outsourcing partners?
+  expected_route: unstructured
+  expected_final_route: unstructured
+  required_citations:
+    - {kind: doc, filing: aapl-20260926.htm, section: 'Item 1A. Risk Factors'}
+  answer_patterns:
+    - '\b(?:single[- ]source|single supplier|limited sources?|supplier concentration)\b'
+    - '\b(?:control|oversight)\b'
+
+- id: meta-q3-fy26-meta-pixel
+  question: According to Part II, Item 1 of Meta's Q3 2026 10-Q, what do the Meta Pixel lawsuits allege about its business tools?
+  expected_route: unstructured
+  expected_final_route: unstructured
+  required_citations:
+    - {kind: doc, filing: meta-20260930.htm, section: 'Part II, Item 1. Legal Proceedings'}
+  answer_patterns:
+    - '\b(?:receiv\w+|collect\w+|obtain\w+|acquir\w+)\b'
+    - '\bthird[- ]party\b'
+    - '\b(?:data|information)\b'
+
+- id: meta-fy24-costs-change
+  question: By exactly how many US dollars did Meta's consolidated costs and expenses increase from FY2023 to FY2024, and what reasons did Meta give in its FY2024 10-K?
+  expected_route: hybrid
+  expected_final_route: hybrid
+  required_citations:
+    - {kind: sql}
+    - {kind: doc, filing: meta-20241231.htm, section: 'Item 7. Management'}
+  required_sql_rows: [[6970000000]]
+  answer_amounts_usd:
+    - {usd: 6970000000}
+  answer_patterns:
+    - '\b(?:infrastructure|data cent(?:ers|res))\b'
+    - '\b(?:employee compensation|staff compensation|personnel costs?)\b'
+
+- id: meta-q3-fy26-costs-change
+  question: By exactly how many US dollars did Meta's consolidated costs and expenses increase in Q3 2026 versus Q3 2025, and what reasons did it give in its Q3 2026 10-Q?
+  expected_route: hybrid
+  expected_final_route: hybrid
+  required_citations:
+    - {kind: sql}
+    - {kind: doc, filing: meta-20260930.htm, section: 'Part I, Item 2. Management'}
+  required_sql_rows: [[20906000000]]
+  answer_amounts_usd:
+    - {usd: 20906000000}
+  answer_patterns:
+    - '\b(?:legal|litigation)\b'
+    - '\b(?:infrastructure|data cent(?:ers|res)|cloud)\b'
+    - '\b(?:AI token|artificial intelligence token)s?\b'
+
+- id: aapl-fy15-revenue-missing
+  question: What was Apple's total net sales in FY2015, using only the loaded financial facts?
+  expected_route: structured
+  expect_abstain: true
+
+- id: aapl-pet-insurance-missing
+  question: What is Apple's policy on employee pet insurance, using only the loaded filings?
+  expected_route: unstructured
+  expect_abstain: true

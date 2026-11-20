@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "km-hybrid-rag"
+version = "0.1.0"
+description = "Hybrid (documents + SQL) knowledge-management Q&A with intent routing and groundedness validation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "langgraph>=0.2.50",
+    "langchain-core>=0.3",
+    "langchain-text-splitters>=0.3",
+    "langchain-chroma>=0.1.4",
+    "chromadb>=0.5",
+    "langchain-openai>=0.2",      # Azure OpenAI + OpenAI (and OpenAI-compatible internal gateways)
+    "rank-bm25>=0.2.2",
+    "pypdf>=4.0",
+    "python-docx>=1.1",
+    "reportlab>=4.0",             # only used to generate the sample PDFs
+    "sqlglot>=25.0",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "pyyaml>=6.0",
+    "beautifulsoup4>=4.12",       # 10-K HTML parsing
+    "streamlit>=1.36",            # web page
+    "azure-identity>=1.15",       # keyless Azure auth via Entra ID / managed identity
+    "langchain-aws>=0.2",         # AWS Bedrock
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+km = "km.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

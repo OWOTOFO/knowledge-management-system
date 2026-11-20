@@ -1,0 +1,233 @@
+name: sec-embedding-ab-v1
+k: 8
+
+# The scorer uses doc_query when present, otherwise the question verbatim.
+# Each evidence group requires one returned passage from the named filing and section
+# with every anchor in its body. Passage numbers can change between index builds.
+retrieval_cases:
+  - id: D01-apple-eu-app-distribution
+    question: How did Apple's FY2024 annual report say it was opening up the way iPhone and iPad apps could reach users and take payments in the EU?
+    tickers: [AAPL]
+    expected_route: unstructured
+    evidence:
+      - id: distribution-and-payments
+        filing: aapl-20240928
+        section_prefix: Item 1A. Risk Factors
+        anchors: [Digital Markets Act, alternative methods of distribution, alternative payment processing]
+    expected_answer: Apple described alternative iOS and iPadOS app distribution and alternative app payment processing as part of its EU Digital Markets Act changes.
+    why: Tests whether a paraphrased question retrieves evidence covering both app distribution and payments. General regulatory-risk language is insufficient.
+
+  - id: D02-apple-china-fy25-decline
+    question: Why did Apple sell less in Greater China in FY2025 even though one product family improved?
+    tickers: [AAPL]
+    expected_route: unstructured
+    evidence:
+      - id: fy25-china-drivers
+        filing: aapl-20250927
+        section_prefix: Item 7. Management
+        anchors: [Greater China net sales decreased during 2025, lower net sales of iPhone, higher net sales of Mac]
+    expected_answer: Lower iPhone net sales were the primary driver, partially offset by higher Mac net sales.
+    why: Pairs with D03 to detect a wrong-year match for the same region when sales moved in opposite directions.
+
+  - id: D03-apple-china-fy26-recovery
+    question: What explains Apple's recovery in Greater China in FY2026, and did currency help or hurt?
+    tickers: [AAPL]
+    expected_route: unstructured
+    evidence:
+      - id: fy26-china-drivers
+        filing: aapl-20260926
+        section_prefix: Item 7. Management
+        anchors: [Greater China net sales increased during 2026, higher net sales of iPhone and Mac, favorable year-over-year impact]
+    expected_answer: Higher iPhone and Mac net sales drove the increase. A stronger renminbi against the dollar helped.
+    why: Requires evidence for both the product drivers and the direction of the currency effect. FY2025 and other regions provide distractors.
+
+  - id: D04-apple-buyback-authorization
+    question: What buyback limit did Apple announce in April 2026, and did that authorization commit it to a minimum purchase?
+    tickers: [AAPL]
+    expected_route: unstructured
+    evidence:
+      - id: authorization
+        filing: aapl-20260926
+        section_prefix: Item 7. Management
+        anchors: [In April 2026, new share repurchase program of up to $100 billion]
+      - id: no-minimum
+        filing: aapl-20260926
+        section_prefix: Item 7. Management
+        anchors: [do not obligate the Company, minimum amount of shares]
+    expected_answer: The authorization was up to USD 100 billion and did not require a minimum purchase.
+    why: Tests evidence spread across adjacent paragraphs and distinguishes the authorization cap, any minimum obligation, and actual purchases.
+
+  - id: D05-meta-eu-ad-choices
+    question: What choices did Meta describe in its FY2024 10-K for people in the EU who wanted fewer targeted ads or no ads?
+    tickers: [META]
+    expected_route: unstructured
+    evidence:
+      - id: paid-ad-free-choice
+        filing: meta-20241231
+        section_prefix: Item 1A. Risk Factors
+        anchors: [subscription for no ads, European Union]
+      - id: free-less-personalized-choice
+        filing: meta-20241231
+        section_prefix: Item 1A. Risk Factors
+        anchors: [free-of-charge, less personalized ads]
+    expected_answer: Users could subscribe to get no ads or keep the free ad-supported service and choose less personalized ads. The free choice does not remove ads.
+    why: Requires retrieval of both choices and checks the distinction between less personalized ads and an ad-free subscription.
+
+  - id: D06-meta-reality-labs-hardware-mix
+    question: Which hardware line pulled Meta's Reality Labs sales up in FY2025, and which one went the other way?
+    tickers: [META]
+    expected_route: unstructured
+    evidence:
+      - id: opposite-hardware-directions
+        filing: meta-20251231
+        section_prefix: Item 7. Management
+        anchors: [RL revenue in 2025 increased, increase in sales of AI glasses, decrease in Meta Quest sales]
+    expected_answer: Higher AI glasses sales drove the increase, partly offset by lower Meta Quest sales.
+    why: Tests informal wording and abbreviations while distinguishing revenue drivers from product descriptions and operating losses.
+
+  - id: D07-meta-mobile-platform-gatekeepers
+    question: Based on Meta's FY2025 10-K, how could changes made by the companies behind mobile operating systems hurt Meta's ability to get its apps to users and make money from them?
+    tickers: [META]
+    expected_route: unstructured
+    evidence:
+      - id: distribution-and-monetization-risk
+        filing: meta-20251231
+        section_prefix: Item 1A. Risk Factors
+        anchors: [update or distribute our products, measure the effectiveness of ads, monetization on mobile devices]
+    expected_answer: Changes to third-party systems, relationships or terms could restrict distribution or updates and degrade functionality. They could also limit ad delivery, targeting or measurement, or impose fees, hurting mobile monetization.
+    why: Tests paraphrase retrieval. A passage naming Android and iOS needs to explain the effects on distribution and monetization to qualify.
+
+  - id: D08-meta-whatsapp-api-interim-measure
+    question: What dispute about outside chatbots and the WhatsApp Business API did Meta report in its Q3 2026 10-Q, and what did the European Commission require while the case was pending?
+    tickers: [META]
+    expected_route: unstructured
+    evidence:
+      - id: chatbot-policy
+        filing: meta-20260930
+        section_prefix: Part II, Item 1. Legal Proceedings
+        anchors: [antitrust investigation, WhatsApp Business API, provide chatbot services]
+      - id: interim-access-requirement
+        filing: meta-20260930
+        section_prefix: Part II, Item 1. Legal Proceedings
+        anchors: [interim measure, offer access to the API for free]
+    expected_answer: The investigation concerned Meta's policy excluding general-purpose AI providers from using the API to offer chatbots. A June 2026 interim measure required free API access for those providers while the investigation continued.
+    why: Tests an exact product name, two separate paragraphs, and the correct part of the 10-Q. An interim measure should be described as provisional.
+
+  - id: H01-apple-fy24-income-tax
+    question: By how much did Apple's consolidated income tax provision rise from FY2023 to FY2024, and what one-time event did Apple identify in its FY2024 10-K as a main driver of the higher tax rate?
+    doc_query: What one-time item does Apple's FY2024 10-K identify as a major reason its effective tax rate rose from FY2023?
+    tickers: [AAPL]
+    expected_route: hybrid
+    evidence:
+      - id: state-aid-charge
+        filing: aapl-20240928
+        section_prefix: Item 7. Management
+        anchors: [The Company’s effective tax rate for 2024 was higher compared to 2023, one-time income tax charge of $10.2 billion, State Aid Decision]
+    sql_gold:
+      view: annual_facts
+      columns: [ticker, period_fiscal_year, concept, unit, value]
+      rows:
+        - [AAPL, 2023, IncomeTaxExpenseBenefit, USD, 16741000000]
+        - [AAPL, 2024, IncomeTaxExpenseBenefit, USD, 29749000000]
+      derived_usd:
+        provision_increase: 13008000000
+    expected_answer: The provision rose by USD 13.008 billion. Apple cited a one-time net USD 10.2 billion charge related to the State Aid Decision as a primary driver of the higher effective tax rate.
+    why: Requires the total change from SQL and the one-time driver from the filing. Checks that the answer preserves both amounts and cites the requested FY2024 disclosure.
+
+  - id: H02-meta-quarter-profit-divergence
+    question: By how much did Meta's consolidated net income rise and operating income fall in Q3 2026 versus Q3 2025, and what tax factor in the Q3 2026 10-Q explains part of the divergence?
+    doc_query: Why does Meta's Q3 2026 10-Q say income tax provision and effective tax rate fell versus the same quarter in 2025?
+    tickers: [META]
+    expected_route: hybrid
+    evidence:
+      - id: quarterly-tax-explanation
+        filing: meta-20260930
+        section_prefix: Part I, Item 2. Management
+        anchors: [three months ended September 30, One Big Beautiful Bill Act, not expected to be tax-deductible]
+    sql_gold:
+      view: quarterly_facts
+      columns: [ticker, period_fiscal_year, fiscal_quarter, concept, unit, value]
+      rows:
+        - [META, 2025, Q3, NetIncomeLoss, USD, 2709000000]
+        - [META, 2026, Q3, NetIncomeLoss, USD, 9860000000]
+        - [META, 2025, Q3, OperatingIncomeLoss, USD, 20535000000]
+        - [META, 2026, Q3, OperatingIncomeLoss, USD, 12988000000]
+      derived_usd:
+        net_income_change: 7151000000
+        operating_income_change: -7547000000
+    expected_answer: Net income rose by USD 7.151 billion while operating income fell by USD 7.547 billion. Meta attributed the lower Q3 2026 tax provision and effective tax rate chiefly to the effects of the One Big Beautiful Bill Act in Q3 2025. Optionally mention the partial offset from the non-deductible portion of the 2026 multistate agreement charge.
+    why: Checks same-quarter comparisons, two profit measures moving in opposite directions, and management's tax explanation. The nine-month totals are distractors.
+
+  - id: H03-two-company-cash-flow
+    question: Compare Apple's and Meta's FY2025 cash generated from operations using the financial facts. For context, also give the dividends and dividend equivalents Apple says it paid and Meta's purchases of property and equipment from its FY2025 free cash flow reconciliation. Cite each company's FY2025 10-K for that context.
+    doc_query: Find FY2025 10-K context for cash uses at both companies, Apple's dividends and dividend equivalents paid and Meta's purchases of property and equipment in its free cash flow reconciliation.
+    tickers: [AAPL, META]
+    expected_route: hybrid
+    evidence:
+      - id: apple-dividend-context
+        filing: aapl-20250927
+        section_prefix: Item 7. Management
+        anchors: [During 2025, paid dividends and dividend equivalents of $15.4 billion]
+      - id: meta-ppe-context
+        filing: meta-20251231
+        section_prefix: Item 7. Management
+        anchors: [Purchases of property and equipment, '69,691', Free cash flow]
+    sql_gold:
+      view: annual_facts
+      columns: [ticker, period_fiscal_year, concept, unit, value]
+      rows:
+        - [AAPL, 2025, NetCashProvidedByUsedInOperatingActivities, USD, 111482000000]
+        - [META, 2025, NetCashProvidedByUsedInOperatingActivities, USD, 115800000000]
+    expected_answer: FY2025 operating cash flow was USD 111.482 billion for Apple and USD 115.800 billion for Meta. Apple describes USD 15.4 billion of dividends and dividend equivalents paid. Meta's reconciliation shows USD 69.691 billion in purchases of property and equipment, with finance lease principal shown separately.
+    why: Tests whether the same Top 8 covers both companies and distinguishes property and equipment purchases from capital expenditures that include finance lease principal.
+
+# These cases are end-to-end controls and do not contribute to the embedding scores.
+controls:
+  - id: S01-apple-diluted-eps
+    question: Using the financial facts, report Apple's diluted earnings per share in FY2025 and FY2026, one USD-per-share figure per fiscal year.
+    expected_route: structured
+    expected_status: answered
+    sql_gold:
+      view: annual_facts
+      columns: [ticker, period_fiscal_year, concept, unit, value]
+      rows:
+        - [AAPL, 2025, EarningsPerShareDiluted, USD/shares, 7.46]
+        - [AAPL, 2026, EarningsPerShareDiluted, USD/shares, 8.98]
+    expected_answer: Apple diluted EPS was USD 7.46 per share in FY2025 and USD 8.98 per share in FY2026. The answer cites the SQL result.
+    why: A SQL-only control for fiscal year, diluted earnings, and USD per share. Use it to identify issues outside document retrieval.
+
+  - id: S02-meta-financing-cash-sign
+    question: In FY2025, how much net cash did Meta's financing activities provide or use? Give the direction and exact amount in USD from the financial facts.
+    expected_route: structured
+    expected_status: answered
+    sql_gold:
+      view: annual_facts
+      columns: [ticker, period_fiscal_year, concept, unit, value]
+      rows:
+        - [META, 2025, NetCashProvidedByUsedInFinancingActivities, USD, -20370000000]
+    expected_answer: Net cash used was USD 20.370 billion, equivalent to negative USD 20,370,000,000 in the signed SQL result. The answer cites the SQL result.
+    why: Checks the sign and direction of financing cash flow and distinguishes it from operating and investing cash flow.
+
+  - id: N01-apple-canada-headcount
+    question: How many full-time-equivalent Apple employees were based in Canada at the end of FY2026? Use only the loaded filings and financial facts.
+    expected_status: abstained
+    expected_answer: The loaded evidence does not establish a Canada-specific count. A global employee figure cannot answer the question.
+    why: Tests abstention when the filing provides global headcount but lacks the requested country-level breakdown.
+
+  - id: N02-meta-brazil-ad-revenue-share
+    question: What exact percentage of Meta's Q3 2026 advertising revenue came from Brazil? Use only the loaded filings and financial facts.
+    expected_status: abstained
+    expected_answer: The loaded evidence does not provide the Brazil-specific advertising revenue needed to calculate this percentage. Rest of World is not Brazil.
+    why: Tests abstention when regional revenue is available but the Brazil-specific numerator is missing.
+
+diagnostics:
+  - id: L01-chinese-query-gate
+    question: "\u82f9\u679c\u516c\u53f8\u6700\u65b0\u5e74\u62a5\u79f0\u5927\u4e2d\u534e\u533a\u9500\u552e\u56de\u5347\u662f\u54ea\u4e9b\u56e0\u7d20\u5e26\u52a8\u7684\uff1f"
+    tickers: [AAPL]
+    evidence:
+      - id: fy26-china-drivers
+        filing: aapl-20260926
+        section_prefix: Item 7. Management
+        anchors: [Greater China net sales increased during 2026, higher net sales of iPhone and Mac, favorable year-over-year impact]
+    expected_answer: D03 describes the expected evidence for the latest Apple annual report in this frozen corpus.
+    why: Uses a Chinese-only query to diagnose whether the English tokenizer stops retrieval before the embedding call. Score this outside the model comparison.

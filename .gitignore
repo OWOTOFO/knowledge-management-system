@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.env
+.index/
+logs/
+data/km.db
+.pytest_cache/
+.DS_Store
+OpenRouterKey.txt
+.Rhistory

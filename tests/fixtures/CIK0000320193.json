@@ -1,0 +1,13 @@
+{"cik": 320193, "entityName": "Apple Inc.", "facts": {
+ "dei": {"EntityCommonStockSharesOutstanding": {"label": "Entity Common Stock, Shares Outstanding", "description": "Shares outstanding.", "units": {"shares": [
+   {"end": "2024-10-18", "val": 15115823000, "accn": "0000320193-24-000123", "fy": 2024, "fp": "FY", "form": "10-K", "filed": "2024-11-01"}]}}},
+ "us-gaap": {
+  "RevenueFromContractWithCustomerExcludingAssessedTax": {"label": "Revenue from Contract with Customer, Excluding Assessed Tax", "description": "Amount of revenue from satisfaction of performance obligations.", "units": {"USD": [
+   {"start": "2021-09-26", "end": "2022-09-24", "val": 394328000000, "accn": "0000320193-22-000108", "fy": 2022, "fp": "FY", "form": "10-K", "filed": "2022-10-28"},
+   {"start": "2021-09-26", "end": "2022-09-24", "val": 394328000000, "accn": "0000320193-24-000123", "fy": 2024, "fp": "FY", "form": "10-K", "filed": "2024-11-01"},
+   {"start": "2023-10-01", "end": "2024-09-28", "val": 391035000000, "accn": "0000320193-24-000123", "fy": 2024, "fp": "FY", "form": "10-K", "filed": "2024-11-01"},
+   {"start": "2024-06-30", "end": "2024-09-28", "val": 94930000000, "accn": "0000320193-24-000123", "fy": 2024, "fp": "FY", "form": "10-K", "filed": "2024-11-01", "frame": "CY2024Q3"},
+   {"start": "2023-10-01", "end": "2023-12-30", "val": 119575000000, "accn": "0000320193-24-000006", "fy": 2024, "fp": "Q1", "form": "10-Q", "filed": "2024-02-02"}]}},
+  "Assets": {"label": "Assets", "description": "Sum of the carrying amounts of all assets.", "units": {"USD": [
+   {"end": "2024-09-28", "val": 364980000000, "accn": "0000320193-24-000123", "fy": 2024, "fp": "FY", "form": "10-K", "filed": "2024-11-01"}]}}
+ }}}

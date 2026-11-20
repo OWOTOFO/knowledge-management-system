@@ -1,0 +1,9 @@
+# Headless avoids Streamlit's first-run e-mail prompt; the start scripts open the browser themselves.
+[server]
+address = "localhost"   # only this computer can open the app (it holds your API key)
+headless = true
+port = 8501
+maxUploadSize = 200
+
+[browser]
+gatherUsageStats = false

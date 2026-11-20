@@ -1,0 +1,37 @@
+# Labelled evaluation questions: expected initial route, whether the system should abstain,
+# and phrases a correct answer must contain (checked case-insensitively).
+
+# --- structured (SQL) ---
+- question: How many complaints were logged per category?
+  expected_route: structured
+  must_contain: ["category", "complaints"]
+- question: What was the total loan volume by region?
+  expected_route: structured
+  must_contain: ["region"]
+- question: What are the interest rates on our credit card products?
+  expected_route: structured
+  must_contain: ["21.99", "24.49"]
+
+# --- unstructured (documents) ---
+- question: What is the deadline for submitting expense reports and do I need receipts?
+  expected_route: unstructured
+  must_contain: ["30 days", "receipts"]
+- question: What should I do if I lose my laptop while working remotely?
+  expected_route: unstructured
+  must_contain: ["24 hours"]
+- question: What is the procedure for handling a credit card dispute?
+  expected_route: unstructured
+  must_contain: ["dispute"]
+
+# --- hybrid (documents + SQL) ---
+- question: Are credit card complaint resolution times within the dispute policy SLA?
+  expected_route: hybrid
+  must_contain: ["30 calendar days", "27.16"]
+- question: Compare our mortgage interest rates with the early repayment terms in the mortgage guide.
+  expected_route: hybrid
+  must_contain: ["early repayment", "6.25"]
+
+# --- out of scope: must abstain rather than guess ---
+- question: What is the bank's policy on cryptocurrency custody for retail clients?
+  expected_route: unstructured
+  expect_abstain: true
